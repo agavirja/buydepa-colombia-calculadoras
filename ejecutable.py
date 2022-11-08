@@ -13,7 +13,7 @@ password = st.secrets["buydepapass"]
 host     = st.secrets["buydepahost"]
 database = st.secrets["buydepadatabase"]
     
-@st.cache(allow_output_mutation=True)
+@st.cache
 def get_id_inmueble_list(x):
     user     = st.secrets["buydepauser"]
     password = st.secrets["buydepapass"]
