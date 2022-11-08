@@ -244,6 +244,8 @@ with st.expander("Actualizar o modificar variables de un inmueble"):
         #except: pass
         #try: longitud = float(longitud)
         #except: pass    
+        latitud  = originvar['latitud']
+        longitud = originvar['longitud']
     
     with  catastrales:
         st.text('Identificacion catastral:')
