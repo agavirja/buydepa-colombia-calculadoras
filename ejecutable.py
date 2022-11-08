@@ -18,7 +18,6 @@ password = st.secrets["buydepapass"]
 host     = st.secrets["buydepahost"]
 database = st.secrets["buydepadatabase"]
     
-@st.cache
 def get_id_inmueble_list(x):
     user     = st.secrets["buydepauser"]
     password = st.secrets["buydepapass"]
@@ -33,7 +32,6 @@ def get_id_inmueble_list(x):
     datainmuebles = datainmuebles.sort_values(by='id_inmueble',ascending=True)
     return datainmuebles
 
-@st.cache
 def get_id_inmueble_cuentas(id_inmueble):
     user     = st.secrets["buydepauser"]
     password = st.secrets["buydepapass"]
@@ -45,7 +43,6 @@ def get_id_inmueble_cuentas(id_inmueble):
     db_connection.close()
     return datacuentas
 
-@st.cache
 def get_inmueble_caracteristicas(id_inmueble):
     user     = st.secrets["buydepauser"]
     password = st.secrets["buydepapass"]
@@ -57,7 +54,6 @@ def get_inmueble_caracteristicas(id_inmueble):
     db_connection.close()
     return datacaracteristicas
 
-@st.experimental_memo
 def convert_df(df):
    return df.to_csv(index=False).encode('utf-8')
 

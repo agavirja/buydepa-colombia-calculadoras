@@ -378,7 +378,6 @@ def PP(inputvar):
 #-----------------------------------------------------------------------------#
 # Recorrido ventaneros
 #-----------------------------------------------------------------------------#
-@st.cache
 def get_data_recorrido(inputvar):
     # Caracteristicas del inmueble
     fcoddir  = coddir(inputvar['direccion'])
