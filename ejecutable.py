@@ -16,6 +16,7 @@ password = st.secrets["buydepapass"]
 host     = st.secrets["buydepahost"]
 database = st.secrets["buydepadatabase"]
 
+@st.cache
 def get_id_inmueble_list(x):
     condicion = ''
     if x:
@@ -26,18 +27,21 @@ def get_id_inmueble_list(x):
     datainmuebles = datainmuebles.sort_values(by='id_inmueble',ascending=True)
     return datainmuebles
 
+@st.cache
 def get_id_inmueble_cuentas(id_inmueble):
     db_connection  = sql.connect(user=user, password=password, host=host, database=database)
     datacuentas    = pd.read_sql(f"SELECT * FROM  {database}.app_pm_cuentas WHERE id_inmueble='{id_inmueble}'" , con=db_connection)
     db_connection.close()
     return datacuentas
 
+@st.cache
 def get_inmueble_caracteristicas(id_inmueble):
     db_connection       = sql.connect(user=user, password=password, host=host, database=database)
     datacaracteristicas = pd.read_sql(f"SELECT * FROM  {database}.data_stock_inmuebles_caracteristicas WHERE id_inmueble='{id_inmueble}'" , con=db_connection)
     db_connection.close()
     return datacaracteristicas
 
+@st.cache
 def convert_df(df):
    return df.to_csv(index=False).encode('utf-8')
 
