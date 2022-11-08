@@ -45,12 +45,12 @@ def get_inmueble_caracteristicas(id_inmueble):
 def convert_df(df):
    return df.to_csv(index=False).encode('utf-8')
 
-col1, col2 = st.columns(2)
-col1.title('Calculadoras Buydepa Colombia')
-col2.image(
+st.image(
             "https://col-images-properties.s3.amazonaws.com/nuevologo.png",
-            width=50, # Manually Adjust the width of the image as per requirement
+            width=200, # Manually Adjust the width of the image as per requirement
         )
+st.title('Calculadoras Buydepa Colombia')
+
 #-----------------------------------------------------------------------------#
 # Precio de compra
 #-----------------------------------------------------------------------------#
