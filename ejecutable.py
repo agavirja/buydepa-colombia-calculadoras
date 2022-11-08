@@ -32,9 +32,8 @@ st.title('Calculadoras Buydepa Colombia')
 #-----------------------------------------------------------------------------#
 # Precio de compra
 #-----------------------------------------------------------------------------#
-with st.expander("Calcular precio de compra"):
+with st.expander("nueva forma de calcular"):
     st.text('cambio a la funcion')
-    x    = True
-    data = get_id_inmueble_list(x)
+    data = get_id_inmueble_list(True)
     st.write(data.head())
             
