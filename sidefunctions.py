@@ -131,7 +131,7 @@ def prefijo(x):
 #-----------------------------------------------------------------------------#
 # Precio de compra
 #-----------------------------------------------------------------------------#
-@st.cache(allow_output_mutation=True)
+@st.cache
 def get_data_market(inputvar):
     # Caracteristicas del inmueble
     metros                = 300
@@ -378,7 +378,7 @@ def PP(inputvar):
 #-----------------------------------------------------------------------------#
 # Recorrido ventaneros
 #-----------------------------------------------------------------------------#
-@st.cache(allow_output_mutation=True)
+@st.cache
 def get_data_recorrido(inputvar):
     # Caracteristicas del inmueble
     fcoddir  = coddir(inputvar['direccion'])
