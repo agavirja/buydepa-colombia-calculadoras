@@ -28,7 +28,7 @@ def get_id_inmueble_list(x):
     if x:
         condicion = ' WHERE activo=1'
     db_connection  = sql.connect(user=user, password=password, host=host, database=database)
-    datainmuebles  = pd.read_sql(f"SELECT id as id_inmueble,direccion_formato,nombre_conjunto FROM colombia.app_callcenter_inbound {condicion}" , con=db_connection)
+    datainmuebles  = pd.read_sql(f"SELECT id as id_inmueble,direccion_formato,nombre_conjunto FROM {database}.app_callcenter_inbound {condicion}" , con=db_connection)
     db_connection.close()
     datainmuebles = datainmuebles.sort_values(by='id_inmueble',ascending=True)
     return datainmuebles
@@ -41,7 +41,7 @@ def get_id_inmueble_cuentas(id_inmueble):
     database = st.secrets["buydepadatabase"]
 
     db_connection  = sql.connect(user=user, password=password, host=host, database=database)
-    datacuentas    = pd.read_sql(f"SELECT * FROM colombia.app_pm_cuentas WHERE id_inmueble='{id_inmueble}'" , con=db_connection)
+    datacuentas    = pd.read_sql(f"SELECT * FROM  {database}.app_pm_cuentas WHERE id_inmueble='{id_inmueble}'" , con=db_connection)
     db_connection.close()
     return datacuentas
 
@@ -53,7 +53,7 @@ def get_inmueble_caracteristicas(id_inmueble):
     database = st.secrets["buydepadatabase"]
 
     db_connection       = sql.connect(user=user, password=password, host=host, database=database)
-    datacaracteristicas = pd.read_sql(f"SELECT * FROM colombia.data_stock_inmuebles_caracteristicas WHERE id_inmueble='{id_inmueble}'" , con=db_connection)
+    datacaracteristicas = pd.read_sql(f"SELECT * FROM  {database}.data_stock_inmuebles_caracteristicas WHERE id_inmueble='{id_inmueble}'" , con=db_connection)
     db_connection.close()
     return datacaracteristicas
 
