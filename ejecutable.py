@@ -13,7 +13,6 @@ password = st.secrets["buydepapass"]
 host     = st.secrets["buydepahost"]
 database = st.secrets["buydepadatabase"]
     
-@st.cache
 def get_id_inmueble_list(x):
     user     = st.secrets["buydepauser"]
     password = st.secrets["buydepapass"]
@@ -33,7 +32,7 @@ st.title('Calculadoras Buydepa Colombia')
 #-----------------------------------------------------------------------------#
 # Precio de compra
 #-----------------------------------------------------------------------------#
-with st.expander("nueva forma de calcular"):
+with st.expander("quitandole el texto de cacher"):
     st.text('cambio a la funcion')
     data = get_id_inmueble_list(True)
     st.write(data.head())
