@@ -131,7 +131,6 @@ def prefijo(x):
 #-----------------------------------------------------------------------------#
 # Precio de compra
 #-----------------------------------------------------------------------------#
-@st.cache
 def get_data_market(inputvar):
     # Caracteristicas del inmueble
     metros                = 300
