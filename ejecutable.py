@@ -2,6 +2,7 @@ import streamlit as st
 import re
 import pandas as pd
 import mysql.connector as sql
+import numpy_financial as npf
 from datetime import datetime 
 from sidefunctions import precio_compra, get_data_market, get_data_recorrido, coddir
 
@@ -11,12 +12,14 @@ from sidefunctions import precio_compra, get_data_market, get_data_recorrido, co
 # https://share.streamlit.io/
 # cuenta de github - agavirja
     
+
+# Calculadora de tasa de interes y cuota mensual
 user     = st.secrets["buydepauser"]
 password = st.secrets["buydepapass"]
 host     = st.secrets["buydepahost"]
 database = st.secrets["buydepadatabase"]
 
-@st.cache
+@st.cache(allow_output_mutation=True)
 def get_id_inmueble_list(x):
     condicion = ''
     if x:
@@ -42,14 +45,20 @@ def get_inmueble_caracteristicas(id_inmueble):
     return datacaracteristicas
 
 @st.cache
+def cuota_mensual(tasaEA,plazo_anos,cuota_financiar):
+    rate   = ((1+tasaEA)**(1 / 12))-1 # Tasa mensual
+    return npf.pmt(rate, plazo_anos*12, -cuota_financiar)
+
+@st.cache
 def convert_df(df):
-   return df.to_csv(index=False).encode('utf-8')
+    return df.to_csv(index=False).encode('utf-8')
+
 
 st.image(
             "https://col-images-properties.s3.amazonaws.com/nuevologo.png",
             width=200, # Manually Adjust the width of the image as per requirement
         )
-st.title('Calculadoras Buydepa Colombia')
+st.subheader('Calculadoras Buydepa Colombia')
 
 #-----------------------------------------------------------------------------#
 # Precio de compra
@@ -129,7 +138,9 @@ with st.expander("¿Cuál es el margen de ganancia de acuerdo a la oferta de ven
     precioventa   = st.text_input('¿Cuál sería el precio de venta?','')
     try:    precioventa = float(precioventa)
     except: precioventa = 0
-    comision_venta = st.slider('¿Comisión en la venta?',min_value=0.0,max_value=3.0,step=0.1,value=0.3)
+    valor = f'${precioventa:,.0f}'
+    st.write(valor)
+    comision_venta = st.slider('¿Comisión en la venta?',min_value=0.0,max_value=6.0,step=0.1,value=0.3)
     comision_venta = comision_venta/100
     st.write("{:.1%}".format(comision_venta))
     
@@ -199,7 +210,102 @@ with st.expander("¿Cuál es el margen de ganancia de acuerdo a la oferta de ven
             col2.write("{:.2%}".format(retornobruto))
             
         else: st.write('No hay precio de compra registrado en la base de datos de property management para el inmueble y no se puede calcular la ganancia')
-        
+
+#-----------------------------------------------------------------------------#
+# Gastos notariales
+#-----------------------------------------------------------------------------# 
+with st.expander("Simulador de gastos notariales"):
+    precio = st.text_input('Precio del inmueble','')
+    try:    precio = float(precio)
+    except: precio = 0
+    valor = f'${precio:,.0f}'
+    st.write(valor)
+    derechos_vendedor = 164000+0.0033*precio  # (regresion)
+    retefuente        = precio*0.01
+    gn_vendedor       = derechos_vendedor+retefuente
+    gn_compra         = 57000+0.0262*precio
+    col1,col2 = st.columns(2)
+    col1.write('Derechos notariables del vendedor')
+    valor = f'${derechos_vendedor:,.0f}'
+    col2.write(valor)
+    col1.write('Retención en la fuente del vendedor')
+    valor = f'${retefuente:,.0f}'
+    col2.write(valor)    
+    col1.write('Total gastos notariales del vendedor')
+    valor = f'${gn_vendedor:,.0f}'
+    col2.write(valor)  
+    col1.write('Total gastos notariales del comprador')
+    valor = f'${gn_compra:,.0f}'
+    col2.write(valor) 
+    col1.write('Total gastos notariales')
+    valortotal = gn_vendedor+gn_compra
+    valor = f'${valortotal:,.0f}'
+    col2.write(valor) 
+    
+
+#-----------------------------------------------------------------------------#
+# Simulacion credito hipotecario
+#-----------------------------------------------------------------------------# 
+with st.expander("Simulador de gastos de cuota mensual del crédito hipotecario"):
+    col1,col2 = st.columns(2)
+    precio = col1.text_input('Precio total del inmueble','')
+    try:    precio = float(precio)
+    except: precio = 0
+    porcentaje_financiar = col2.slider('Porcentaje a financiar',min_value=0,max_value=100,step=1,value=70)
+    porcentaje_financiar = porcentaje_financiar/100
+    tasaEA = col1.slider('Tasa efectiva anual',min_value=0.0,max_value=30.0,step=0.1,value=15.0)
+    tasaEA = tasaEA/100
+    plazo_anos = col2.slider('Plazo en años',min_value=0,max_value=30,step=1,value=10)
+
+    col1,col2 = st.columns(2)
+    col1.write('Valor del inmueble')
+    valor = f'${precio:,.0f}'
+    col2.write(valor)
+    col1.write('Porcentaje a financiar')
+    col2.write("{:.1%}".format(porcentaje_financiar))
+    col1.write('Plazo en años')
+    col2.write(str(plazo_anos))
+    
+    cuota_inicial = precio*(1-porcentaje_financiar)
+    col1.write('Cuota inicial')
+    valor = f'${cuota_inicial:,.0f}'
+    col2.write(valor)  
+    cuota_financiar = precio*porcentaje_financiar
+    col1.write('Cuota a financiar')
+    valor = f'${cuota_financiar:,.0f}'
+    col2.write(valor) 
+    
+    cuota_mensual = cuota_mensual(tasaEA,plazo_anos,cuota_financiar)
+    col1.write('Cuota mensual')
+    valor = f'${cuota_mensual:,.0f}'
+    col2.write(valor)      
+ 
+#-----------------------------------------------------------------------------#
+# Solicitar credito hipotecario LQN
+#-----------------------------------------------------------------------------# 
+with st.expander("Solicitud crédito hipotecario (LQN)"):
+    st.write("Link para el interesado del crédito [link](https://loquenecesito.co/c/perfilador-credito?referrerCode=DhD0VUhXznto)")
+    #st.write("https://loquenecesito.co/c/perfilador-credito?referrerCode=DhD0VUhXznto")
+    st.write("Link para el seguimiento interno [link](https://backoffice.lqnvivienda.com/login)")
+    st.text('agavirja@gmail.com')
+    st.text('Aa12345678')
+    st.text("""
+    Documentos requeridos:
+
+    Empleados:
+    Fotocopia de cédula ampliada al 150%
+    Carta laboral (cargo, salario,antigüedad, tipo de contrato. No mayor a 30 días).
+    Comprobantes de nómina, equivalente a los tres últimos meses.
+    Certificado de Ingresos y retenciones del último año. (Firmado)
+    
+    Pensionados:
+    Resolución de la pensión 
+    Fotocopia de cédula ampliada al 150%
+    Comprobantes de nómina, equivalente a los tres últimos meses.
+    Certificado de Ingresos y retenciones del último año. (Firmado)
+    """)
+    
+
 #-----------------------------------------------------------------------------#
 # Actualizar caracteristicas de un inmueble
 #-----------------------------------------------------------------------------# 
